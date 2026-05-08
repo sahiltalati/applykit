@@ -15,7 +15,7 @@
 
 const SHEET_NAME = 'Applications';
 
-const COLUMNS = ['Date Applied', 'Company', 'Role', 'Status', 'Job URL', 'Notes', 'Logged At'];
+const COLUMNS = ['Date Applied', 'Company', 'Role', 'Location', 'Status', 'Job URL', 'Notes', 'Logged At'];
 
 function getOrCreateSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -54,6 +54,7 @@ function doPost(e) {
       data.date || new Date().toISOString().split('T')[0],
       data.company || '',
       data.role || '',
+      data.location || '',
       data.status || 'Applied',
       data.url || '',
       data.notes || '',

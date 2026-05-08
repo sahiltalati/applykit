@@ -7,6 +7,7 @@ const extractors = {
     extract: () => ({
       company: document.querySelector('.job-details-jobs-unified-top-card__company-name a, .jobs-unified-top-card__company-name a')?.innerText?.trim(),
       role: document.querySelector('.job-details-jobs-unified-top-card__job-title h1, .jobs-unified-top-card__job-title')?.innerText?.trim(),
+      location: document.querySelector('.job-details-jobs-unified-top-card__bullet, .jobs-unified-top-card__workplace-type')?.innerText?.trim(),
     }),
   },
   // Greenhouse ATS
@@ -17,6 +18,7 @@ const extractors = {
         || document.title.split(' at ')[1]?.split(' - ')[0]?.trim(),
       role: document.querySelector('#header h1, .app-title')?.innerText?.trim()
         || document.title.split(' at ')[0]?.trim(),
+      location: document.querySelector('.location')?.innerText?.trim(),
     }),
   },
   // Lever ATS
@@ -25,6 +27,7 @@ const extractors = {
     extract: () => ({
       company: location.pathname.split('/')[1],
       role: document.querySelector('.posting-headline h2')?.innerText?.trim(),
+      location: document.querySelector('.posting-categories .location')?.innerText?.trim(),
     }),
   },
   // Workday
@@ -35,6 +38,7 @@ const extractors = {
         || document.title.split('|')[1]?.trim(),
       role: document.querySelector('[data-automation-id="jobPostingHeader"] h2')?.innerText?.trim()
         || document.title.split('|')[0]?.trim(),
+      location: document.querySelector('[data-automation-id="locations"]')?.innerText?.trim(),
     }),
   },
   // Indeed
@@ -43,6 +47,7 @@ const extractors = {
     extract: () => ({
       company: document.querySelector('[data-company-name], .css-87uc0g')?.innerText?.trim(),
       role: document.querySelector('.jobsearch-JobInfoHeader-title, h1.icl-u-xs-mb--xs')?.innerText?.trim(),
+      location: document.querySelector('[data-testid="job-location"], .css-6z8o9s')?.innerText?.trim(),
     }),
   },
   // Jobvite
@@ -53,6 +58,7 @@ const extractors = {
         || document.title.split(' - ')[1]?.trim(),
       role: document.querySelector('.jv-header h1')?.innerText?.trim()
         || document.title.split(' - ')[0]?.trim(),
+      location: document.querySelector('.jv-job-detail-meta span')?.innerText?.trim(),
     }),
   },
   // iCIMS
@@ -61,6 +67,7 @@ const extractors = {
     extract: () => ({
       company: document.querySelector('.iCIMS_MainColumn .iCIMS_Header h2')?.innerText?.trim(),
       role: document.querySelector('#iCIMS_JobTitle, .iCIMS_JobTitle h1')?.innerText?.trim(),
+      location: document.querySelector('.iCIMS_InfoMsg .iCIMS_Offices')?.innerText?.trim(),
     }),
   },
   // Generic fallback — parse page title

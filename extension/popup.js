@@ -27,6 +27,7 @@ async function init() {
     if (details) {
       if (details.company) $('company').value = details.company;
       if (details.role) $('role').value = details.role;
+      if (details.location) $('location').value = details.location;
       if (details.url) $('url').value = details.url;
     }
   } catch (e) {
@@ -56,6 +57,7 @@ $('log-btn').addEventListener('click', async () => {
   const payload = {
     company: $('company').value.trim(),
     role: $('role').value.trim(),
+    location: $('location').value.trim(),
     date: $('date').value,
     status: $('status').value,
     url: $('url').value.trim(),
