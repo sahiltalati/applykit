@@ -19,7 +19,7 @@ ApplyKit automates all of it.
 3. Claude edits your resume to match the JD → compiles a PDF
 4. The PDF auto-moves from ~/Downloads to ~/Documents/JobApps instantly
 5. You submit the application
-6. Click the ApplyKit Chrome extension → one click logs it to Google Sheets
+6. Click the ApplyKit Chrome extension → one click logs it to Google Sheets (You may have to fill in info that might be missing)
 ```
 
 ---
