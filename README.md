@@ -15,7 +15,7 @@ ApplyKit automates all of it.
 
 ```
 1. Find a job posting
-2. Tell Claude Code: "Tailor my resume for this role: [paste JD or URL]"
+2. Tell Claude Chat: "Tailor my resume for this role: [paste JD or URL]"
 3. Claude edits your resume to match the JD → compiles a PDF
 4. The PDF auto-moves from ~/Downloads to ~/Documents/JobApps instantly
 5. You submit the application
