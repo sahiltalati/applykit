@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApplyKit</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      width: 320px;
+      background: #0f0f0f;
+      color: #f0f0f0;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      padding: 14px 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-logo {
+      font-size: 20px;
+    }
+
+    .header-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .header-text p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.75);
+      margin-top: 1px;
+    }
+
+    .body {
+      padding: 14px 16px;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      background: #1c1c1e;
+      border: 1px solid #2c2c2e;
+      border-radius: 7px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #f0f0f0;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus {
+      border-color: #6366f1;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      background: #1c1c1e;
+      border: 1px solid #2c2c2e;
+      border-radius: 7px;
+      width: 100%;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .status-badge:hover { border-color: #444; }
+
+    select {
+      background: none;
+      border: none;
+      color: #f0f0f0;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    select option { background: #1c1c1e; }
+
+    .log-btn {
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: opacity 0.15s;
+    }
+
+    .log-btn:hover { opacity: 0.9; }
+    .log-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result {
+      margin-top: 10px;
+      padding: 9px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .result.success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      display: block;
+    }
+
+    .result.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      display: block;
+    }
+
+    .divider {
+      height: 1px;
+      background: #2c2c2e;
+      margin: 12px 0;
+    }
+
+    .settings-link {
+      text-align: center;
+      font-size: 11px;
+      color: #555;
+      cursor: pointer;
+      padding-bottom: 2px;
+    }
+
+    .settings-link:hover { color: #888; }
+
+    .settings-panel {
+      display: none;
+    }
+
+    .settings-panel.open {
+      display: block;
+    }
+
+    .settings-panel input {
+      font-size: 11px;
+      padding: 7px 9px;
+    }
+
+    .save-btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px;
+      background: #2c2c2e;
+      border: none;
+      border-radius: 7px;
+      color: #f0f0f0;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .save-btn:hover { background: #3a3a3c; }
+
+    .no-webhook {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #fbbf24;
+      margin-bottom: 12px;
+    }
+
+    .no-webhook a {
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-logo">🚀</div>
+    <div class="header-text">
+      <h1>ApplyKit</h1>
+      <p>Log this application to Google Sheets</p>
+    </div>
+  </div>
+
+  <div class="body">
+    <div id="no-webhook-warning" class="no-webhook" style="display:none">
+      ⚙️ Set your Google Sheets webhook URL below to start logging.
+    </div>
+
+    <div class="field">
+      <label>Company</label>
+      <input id="company" type="text" placeholder="e.g. Stripe" />
+    </div>
+
+    <div class="field">
+      <label>Role</label>
+      <input id="role" type="text" placeholder="e.g. Software Engineer" />
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Date Applied</label>
+        <input id="date" type="date" />
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <div class="status-badge">
+          <select id="status">
+            <option value="Applied">Applied</option>
+            <option value="Phone Screen">Phone Screen</option>
+            <option value="Interview">Interview</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Job URL</label>
+      <input id="url" type="text" placeholder="https://..." />
+    </div>
+
+    <div class="field">
+      <label>Notes</label>
+      <input id="notes" type="text" placeholder="Optional" />
+    </div>
+
+    <button class="log-btn" id="log-btn">Log Application</button>
+
+    <div id="result" class="result"></div>
+
+    <div class="divider"></div>
+
+    <div class="settings-link" id="settings-toggle">⚙️ Settings</div>
+
+    <div class="settings-panel" id="settings-panel">
+      <div class="field" style="margin-top:10px">
+        <label>Google Sheets Webhook URL</label>
+        <input id="webhook-url" type="text" placeholder="https://script.google.com/macros/s/..." />
+      </div>
+      <button class="save-btn" id="save-settings">Save</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
