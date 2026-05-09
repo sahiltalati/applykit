@@ -8,7 +8,7 @@ Trigger on: "tailor my resume", "apply for this job", "optimize my resume for [C
 
 ## Setup (first time only)
 
-Place your base resume at `~/.applykit/resume.tex` (LaTeX) or `~/.applykit/resume.md` (Markdown).
+Place your base resume at `~/.applykit/resume.tex`:
 
 ```bash
 mkdir -p ~/.applykit
@@ -23,100 +23,54 @@ brew install --cask basictex
 sudo apt install texlive-latex-extra
 ```
 
-> **Note:** pdflatex may not be on your `$PATH` after install. The skill detects it automatically — see Step 5.
+> pdflatex may not be on your PATH after install — the skill detects it automatically.
 
 ---
 
-## Inputs / Outputs
+## Tailoring Rules
 
-**Input:** A job description — pasted text, a URL, or an attached file.
-**Output:** A tailored PDF saved to `~/Documents/JobApps/YourName_Resume_CompanyName.pdf`
+**DO:** Rephrase bullets to mirror JD vocabulary (only where experience genuinely matches), reorder bullets within roles (most relevant first), bold JD-matched keywords, reorder Technical Skills to lead with JD stack.
 
----
-
-## Tailoring Philosophy: Moderate
-
-**DO:**
-- Rephrase bullet text to mirror JD vocabulary (only where experience genuinely matches)
-- Reorder bullets within each role — most JD-relevant first
-- Reorder projects/sections to surface the most relevant items
-- Bold keywords that match the JD
-- Reorder Technical Skills lines to lead with JD-mentioned technologies
-
-**DO NOT:**
-- Invent experience, technologies, metrics, or outcomes
-- Change company names, job titles, dates, or numeric metrics
-- Drop entire sections
-- Add buzzwords that don't map to real experience in the resume
+**DO NOT:** Invent experience, metrics, or technologies. Change dates, titles, company names, or numeric metrics. Drop any section.
 
 ---
 
-## Process
+## Process — 3 tool calls total, no exceptions
 
-### Step 1 — Read the base resume
-Read `~/.applykit/resume.tex` (or `~/.applykit/resume.md`). Write the content to `/tmp/applykit-build/working-resume.tex` as your starting point.
+The base resume is already in your context (read from ~/.applykit/resume.tex or embedded in this skill). Do NOT write the base to disk and then edit it — that wastes 4-6 tool calls. Think through all changes mentally, then write the final version in one shot.
 
-### Step 2 — Parse the job description
-If a URL is provided, fetch it first. Extract:
-- Company name (sanitize for filename: remove spaces/punctuation, e.g. "Goldman Sachs" → "GoldmanSachs")
-- Role title
-- Hard requirements — must-have technologies, languages, frameworks
-- Nice-to-haves
-- Repeated themes and exact vocabulary (ATS matches strings)
+### Step 1 — Think (no tool call)
 
-If the company name is unclear, ask the user once before proceeding.
+Parse the JD in your head. Extract company name, hard requirements, nice-to-haves, key vocabulary. Map each JD keyword to the bullet(s) in the base resume that genuinely match. Decide: rephrase, bold, reorder, or skip.
 
-### Step 3 — Map JD keywords to resume content
-For each significant JD keyword, find the bullet(s) in the resume that demonstrate genuine experience with it. Build a map of keyword → bullet → action (rephrase, bold, reorder, skip if no real match).
+If the JD is a URL, fetch it first (only allowed extra tool call).
 
-### Step 4 — Apply edits
-Edit `/tmp/applykit-build/working-resume.tex`:
-1. Rephrase `\resumeItem` content to use JD vocabulary where genuine
-2. Reorder `\resumeItem` lines within each role — most JD-relevant first
-3. Adjust `\textbf{}` emphasis to bold JD-relevant keywords
-4. Reorder Technical Skills items so JD stack appears first
-5. Re-read end-to-end: verify nothing fabricated, all metrics unchanged, all braces balanced
+CompanyName: remove spaces and punctuation, use well-known name (e.g. "Goldman Sachs" -> "GoldmanSachs").
 
-### Step 5 — Compile
-First, locate pdflatex — it is often not on PATH:
+### Step 2 — Write final .tex in one shot (1 Write call)
+
+Write the complete tailored LaTeX to /tmp/working-resume.tex in a single Write call. Apply all changes as you write:
+- Rephrase \resumeItem text to mirror JD vocabulary where genuine
+- Reorder \resumeItem lines within each role — most JD-relevant first
+- Add/remove \textbf{} on JD-matched keywords
+- Reorder Technical Skills so JD stack appears first
+- Never touch the preamble, section headings, or custom command definitions
+- Escape special chars: & -> \&, % -> \%, $ -> \$, _ -> \_
+
+### Step 3 — Compile and save (1 Bash call)
 
 ```bash
-which pdflatex 2>/dev/null || find /usr /opt /Library /home -name pdflatex 2>/dev/null | head -1
+PDFLATEX=$(which pdflatex 2>/dev/null || find /usr /opt /Library /home -name pdflatex 2>/dev/null | head -1) && mkdir -p "$HOME/Documents/JobApps" && cd /tmp && $PDFLATEX -interaction=nonstopmode -halt-on-error working-resume.tex && cp /tmp/working-resume.pdf "$HOME/Documents/JobApps/YourName_Resume_CompanyName.pdf"
 ```
 
-Then compile using that path:
+Replace YourName and CompanyName before running.
 
-```bash
-mkdir -p /tmp/applykit-build
-cd /tmp/applykit-build
-PDFLATEX_PATH -interaction=nonstopmode -halt-on-error working-resume.tex
-```
-
-If compilation fails, read `/tmp/applykit-build/working-resume.log`. Common fixes:
-- Unescaped special characters (& to \&, % to \%, $ to \$, _ to \_)
-- Unbalanced braces
-- Missing package: find tlmgr with `which tlmgr 2>/dev/null || find /usr /opt /Library -name tlmgr 2>/dev/null | head -1`, then run `TLMGR_PATH install PACKAGE`
+If compilation fails, read /tmp/working-resume.log, fix /tmp/working-resume.tex, rerun. Common causes: unescaped & % $ _, unbalanced braces.
 
 If output exceeds one page, tighten the longest bullets. Do not change fonts or margins.
 
-### Step 6 — Save
-```bash
-mkdir -p ~/Documents/JobApps
-cp /tmp/applykit-build/working-resume.pdf ~/Documents/JobApps/YourName_Resume_CompanyName.pdf
-```
+### Done — report to user
 
-Replace `YourName` with the name from the resume header. Replace `CompanyName` with the sanitized company name.
-
-### Step 7 — Report
-Summarize:
-- Top 3-5 keywords/themes emphasized
+- Top 3-5 keywords emphasized
 - What was reordered
-- Any JD requirements not addressable from the base resume (so the user can address them in a cover letter)
-
----
-
-## Rules
-- Never fabricate. If a JD demands Rust and there is no Rust experience, note it — do not add it.
-- Never change dates, titles, company names, or numeric metrics.
-- Always compile and verify before declaring done.
-- Filename format: `YourName_Resume_CompanyName.pdf` — no spaces, no punctuation.
+- Any JD requirements missing from the resume (gaps for cover letter)
