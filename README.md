@@ -84,6 +84,8 @@ cp /path/to/your/resume.tex ~/.applykit/resume.tex
 
 Supports `.tex` (LaTeX) or `.md` (Markdown).
 
+> **LaTeX users:** If your `.tex` file contains `\usepackage{comment}`, remove it — this package is not installed in most minimal TeX distributions and causes a fatal compile error. It is almost never needed.
+
 **Install pdflatex** (required for LaTeX resumes):
 
 ```bash
@@ -211,11 +213,38 @@ Windows/Linux contributions welcome — the watcher just needs a Task Scheduler 
 - Make sure `/bin/bash` has Full Disk Access (System Settings → Privacy & Security)
 - Run `launchctl list | grep applykit` — should show a PID
 
-**pdflatex not found?**
+**pdflatex not found or compilation fails?**
+
+Install it:
 ```bash
-/opt/homebrew/bin/brew install --cask basictex
-sudo bash scripts/setup-latex.sh
+# macOS
+brew install --cask basictex
+# Linux
+sudo apt install texlive-latex-extra
 ```
+
+pdflatex is often **not added to `$PATH`** automatically. The skill detects it, but if you want it available globally:
+```bash
+# macOS — find where it was installed
+find /usr /opt /Library -name pdflatex 2>/dev/null | head -1
+# Then symlink it (example path — use whatever the above returns)
+sudo ln -sf /usr/local/texlive/2026basic/bin/universal-darwin/pdflatex /usr/local/bin/pdflatex
+```
+
+**LaTeX package missing during compile?**
+
+Find `tlmgr` and install the package:
+```bash
+find /usr /opt /Library -name tlmgr 2>/dev/null | head -1
+# Then: <tlmgr-path> install <package-name>
+```
+
+Common missing packages and what causes them:
+| Error | Package to install |
+|---|---|
+| `comment.sty not found` | Remove `\usepackage{comment}` from your `.tex` — it is unused |
+| `CormorantGaramond not found` | `tlmgr install cormorantgaramond` |
+| `marvosym not found` | `tlmgr install marvosym` |
 
 **Extension not logging to Sheets?**
 - Check the webhook URL in Settings — it should end in `/exec`
@@ -241,3 +270,4 @@ MIT — use it, fork it, build on it.
 ---
 
 Built with [Claude Code](https://claude.ai/code)
+
