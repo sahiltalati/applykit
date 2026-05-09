@@ -17,9 +17,13 @@ cp /path/to/your/resume.tex ~/.applykit/resume.tex
 
 If pdflatex is not installed:
 ```bash
+# macOS
 brew install --cask basictex
-bash ~/path/to/applykit/scripts/setup-latex.sh
+# Linux
+sudo apt install texlive-latex-extra
 ```
+
+> **Note:** pdflatex may not be on your `$PATH` after install. The skill detects it automatically — see Step 5.
 
 ---
 
@@ -74,16 +78,24 @@ Edit `/tmp/applykit-build/working-resume.tex`:
 5. Re-read end-to-end: verify nothing fabricated, all metrics unchanged, all braces balanced
 
 ### Step 5 — Compile
+First, locate pdflatex — it is often not on PATH:
+
+```bash
+which pdflatex 2>/dev/null || find /usr /opt /Library /home -name pdflatex 2>/dev/null | head -1
+```
+
+Then compile using that path:
+
 ```bash
 mkdir -p /tmp/applykit-build
 cd /tmp/applykit-build
-pdflatex -interaction=nonstopmode -halt-on-error working-resume.tex
+PDFLATEX_PATH -interaction=nonstopmode -halt-on-error working-resume.tex
 ```
 
-If compilation fails, read the `.log` file. Common fixes:
-- Unescaped special characters (`&` → `\&`, `%` → `\%`, `$` → `\$`)
+If compilation fails, read `/tmp/applykit-build/working-resume.log`. Common fixes:
+- Unescaped special characters (& to \&, % to \%, $ to \$, _ to \_)
 - Unbalanced braces
-- Missing package → install with `sudo /Library/TeX/texbin/tlmgr install <package>`
+- Missing package: find tlmgr with `which tlmgr 2>/dev/null || find /usr /opt /Library -name tlmgr 2>/dev/null | head -1`, then run `TLMGR_PATH install PACKAGE`
 
 If output exceeds one page, tighten the longest bullets. Do not change fonts or margins.
 
@@ -97,14 +109,14 @@ Replace `YourName` with the name from the resume header. Replace `CompanyName` w
 
 ### Step 7 — Report
 Summarize:
-- Top 3–5 keywords/themes emphasized
+- Top 3-5 keywords/themes emphasized
 - What was reordered
 - Any JD requirements not addressable from the base resume (so the user can address them in a cover letter)
 
 ---
 
 ## Rules
-- Never fabricate. If a JD demands Rust and there's no Rust experience, note it — don't add it.
+- Never fabricate. If a JD demands Rust and there is no Rust experience, note it — do not add it.
 - Never change dates, titles, company names, or numeric metrics.
 - Always compile and verify before declaring done.
 - Filename format: `YourName_Resume_CompanyName.pdf` — no spaces, no punctuation.
