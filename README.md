@@ -1,273 +1,118 @@
-# ApplyKit 🚀
+# ApplyKit 🗂️
 
-**The open-source job application OS.**
+**A Chrome extension that logs job applications to Google Sheets in one click.**
 
-Stop doing these three things manually:
-- Rewriting your resume for every role
-- Digging through Downloads for the right PDF
-- Trying to remember which companies you applied to
+When you're on any job page — LinkedIn, Greenhouse, Lever, Workday, Indeed, and more — click the ApplyKit icon and it auto-fills the company, role, location, and URL. Hit **Log Application** and it goes straight into your Google Sheet.
 
-ApplyKit automates all of it.
+No more spreadsheet copy-pasting. No more forgetting what you applied to.
 
 ---
 
-## How it works
-
-```
-1. Find a job posting
-2. Tell Claude Chat: "Tailor my resume for this role: [paste JD or URL]"
-3. Claude edits your resume to match the JD → compiles a PDF
-4. The PDF auto-moves from ~/Downloads to ~/Documents/JobApps instantly
-5. You submit the application
-6. Click the ApplyKit Chrome extension → one click logs it to Google Sheets (You may have to fill in info that might be missing)
-```
-
----
-
-## The Three Components
-
-| Component | What it does | Platform |
-|---|---|---|
-| **Resume Tailor** | Claude Code skill — tailors your resume to any JD | Mac / Windows / Linux |
-| **Auto-Move** | macOS background script — files resume PDFs automatically | Mac only |
-| **App Tracker** | Chrome extension — logs applications to Google Sheets | Any OS + Chrome |
-
----
-
-## Installation
-
-### Prerequisites
-- [Claude Code](https://claude.ai/code) (free)
-- macOS Ventura or later (for Auto-Move)
-- Google Chrome (for App Tracker)
-
----
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/sahiltalati/applykit.git
-cd applykit
-```
-
----
-
-### 2. Auto-Move Script (macOS)
-
-Run the interactive installer:
-
-```bash
-bash install.sh
-```
-
-It will ask for:
-- **Watch directory** — where to look for new resumes (default: `~/Downloads`)
-- **Destination** — where to move them (default: `~/Documents/JobApps`)
-- **Filename pattern** — which files to move (default: `*_Resume_*.pdf`)
-
-**One manual step — grant bash Full Disk Access:**
-
-> System Settings → Privacy & Security → Full Disk Access → `+` → navigate to `/bin/bash` → Add → toggle ON
-
-This is required on macOS Ventura+ for background scripts to read the Downloads folder. You only do this once.
-
----
-
-### 3. Resume Tailor Skill (Claude Code)
-
-**Place your resume:**
-
-```bash
-mkdir -p ~/.applykit
-cp /path/to/your/resume.tex ~/.applykit/resume.tex
-```
-
-Supports `.tex` (LaTeX) or `.md` (Markdown).
-
-> **LaTeX users:** If your `.tex` file contains `\usepackage{comment}`, remove it — this package is not installed in most minimal TeX distributions and causes a fatal compile error. It is almost never needed.
-
-**Install pdflatex** (required for LaTeX resumes):
-
-```bash
-/opt/homebrew/bin/brew install --cask basictex
-sudo bash scripts/setup-latex.sh
-```
-
-**Install the skill:**
-
-```bash
-mkdir -p ~/.claude/skills
-cp skill/resume-tailor.md ~/.claude/skills/resume-tailor.md
-```
-
-**Use it in Claude Code:**
-
-```
-Tailor my resume for this role: [paste job description or URL]
-```
-
-The tailored PDF is saved to `~/Documents/JobApps/YourName_Resume_CompanyName.pdf` automatically.
-
----
-
-### 4. Chrome Extension (App Tracker)
-
-**Load the extension:**
-
-1. Open Chrome → `chrome://extensions`
-2. Enable **Developer mode** (top right)
-3. Click **Load unpacked** → select the `extension/` folder
-
-**Set up Google Sheets:**
-
-1. Create a new Google Sheet
-2. Open **Extensions → Apps Script**
-3. Delete the default code, paste the contents of `sheets/apps-script.js`
-4. Click **Save**, then **Deploy → New deployment**
-   - Type: **Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-5. Click **Deploy → Authorize access → Allow**
-6. Copy the Web app URL
-
-**Connect the extension:**
-
-1. Click the ApplyKit briefcase icon in Chrome toolbar
-2. Click **⚙️ Settings**
-3. Paste the Web app URL → **Save**
-
----
-
-## Usage
-
-### Tailoring a resume
-
-In Claude Code:
-
-```
-Tailor my resume for this role: https://jobs.example.com/software-engineer
-```
-
-Or paste the full job description directly. Claude will:
-- Mirror the JD's keywords and vocabulary
-- Reorder bullets to lead with the most relevant experience
-- Compile and save the PDF to `~/Documents/JobApps/`
-
-The Auto-Move script will handle filing if the PDF lands in Downloads first.
-
-### Logging an application
-
-After submitting an application:
-1. Click the **ApplyKit** icon in the Chrome toolbar
-2. Company, Role, Location, and URL are auto-filled from the page
-3. Click **Log Application**
-
-Your Google Sheet gets a new row:
+## What gets logged
 
 | Date Applied | Company | Role | Location | Status | Job URL | Notes | Logged At |
 |---|---|---|---|---|---|---|---|
-| 2026-05-08 | Intact FC | Software Developer I | Toronto, ON | Applied | https://... | | 2026-05-08 10:32 |
-
-### Supported job sites (auto-detection)
-
-LinkedIn · Greenhouse · Lever · Workday · Indeed · Jobvite · iCIMS · any site with standard page titles
+| 2026-05-11 | Stripe | Software Engineer Intern | Toronto, ON | Applied | https://... | | 2026-05-11 10:32 AM |
 
 ---
 
-## Uninstall
+## Installation — 3 steps
 
-```bash
-bash uninstall.sh
-```
+### Step 1 — Load the extension in Chrome
 
-Removes the LaunchAgent and move script. Your `JobApps` folder and Google Sheet are preserved.
+1. Download or clone this repo:
+   ```bash
+   git clone https://github.com/sahiltalati/applykit.git
+   ```
+2. Open Chrome and go to `chrome://extensions`
+3. Toggle **Developer mode** ON (top right)
+4. Click **Load unpacked**
+5. Select the `extension/` folder from the cloned repo
 
----
-
-## Platform Support
-
-| Feature | macOS | Windows | Linux |
-|---|---|---|---|
-| Auto-Move | ✅ | 🔜 | 🔜 |
-| Resume Tailor | ✅ | ✅ | ✅ |
-| Chrome Extension | ✅ | ✅ | ✅ |
-
-Windows/Linux contributions welcome — the watcher just needs a Task Scheduler or systemd equivalent.
+The ApplyKit briefcase icon will appear in your Chrome toolbar.
 
 ---
 
-## Logs
+### Step 2 — Set up your Google Sheet
 
-```
-~/Library/Logs/applykit-move.log   — every file move with timestamp
-/tmp/applykit-move.out             — LaunchAgent stdout
-/tmp/applykit-move.err             — LaunchAgent stderr
-```
+1. Go to [Google Sheets](https://sheets.google.com) and create a new spreadsheet
+2. Import the template:
+   - File → Import → Upload → select `sheets/template.csv` from the repo
+   - Import location: **Replace spreadsheet** → Import data
+   
+   Your sheet will have all the right columns pre-configured.
+
+3. Open **Extensions → Apps Script** from the Google Sheet menu
+4. Delete the default code and paste everything from `sheets/apps-script.js`
+5. Click **Save** (Cmd+S)
+6. Click **Deploy → New deployment**
+   - Click the gear icon ⚙️ → select **Web app**
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+7. Click **Deploy → Authorize access**
+   - If you see "Google hasn't verified this app" → click **Advanced → Go to ApplyKit (unsafe) → Allow**
+8. Copy the **Web app URL** (looks like `https://script.google.com/macros/s/.../exec`)
 
 ---
 
-## Troubleshooting
+### Step 3 — Connect the extension to your Sheet
 
-**Resume not moving from Downloads?**
-- Check `~/Library/Logs/applykit-move.log` for errors
-- Make sure `/bin/bash` has Full Disk Access (System Settings → Privacy & Security)
-- Run `launchctl list | grep applykit` — should show a PID
+1. Click the ApplyKit icon in your Chrome toolbar
+2. Click **⚙️ Settings** at the bottom
+3. Paste the Web app URL → click **Save**
 
-**pdflatex not found or compilation fails?**
+Done. You're set up.
 
-Install it:
-```bash
-# macOS
-brew install --cask basictex
-# Linux
-sudo apt install texlive-latex-extra
-```
+---
 
-pdflatex is often **not added to `$PATH`** automatically. The skill detects it, but if you want it available globally:
-```bash
-# macOS — find where it was installed
-find /usr /opt /Library -name pdflatex 2>/dev/null | head -1
-# Then symlink it (example path — use whatever the above returns)
-sudo ln -sf /usr/local/texlive/2026basic/bin/universal-darwin/pdflatex /usr/local/bin/pdflatex
-```
+## How to use it
 
-**LaTeX package missing during compile?**
+1. Find a job on LinkedIn (or any job site)
+2. Click through to the company's career page
+3. Fill out the application
+4. Right before hitting Submit → click the **ApplyKit icon**
+5. Company, role, location, and URL auto-fill from the page
+6. Add any notes, confirm the status → click **Log Application**
+7. Submit your application
 
-Find `tlmgr` and install the package:
-```bash
-find /usr /opt /Library -name tlmgr 2>/dev/null | head -1
-# Then: <tlmgr-path> install <package-name>
-```
+The row appears in your Google Sheet instantly.
 
-Common missing packages and what causes them:
-| Error | Package to install |
-|---|---|
-| `comment.sty not found` | Remove `\usepackage{comment}` from your `.tex` — it is unused |
-| `CormorantGaramond not found` | `tlmgr install cormorantgaramond` |
-| `marvosym not found` | `tlmgr install marvosym` |
+---
 
-**Extension not logging to Sheets?**
-- Check the webhook URL in Settings — it should end in `/exec`
-- Make sure Apps Script is deployed as "Anyone" can access
-- Open Chrome DevTools → Console while clicking Log Application to see errors
+## Supported job sites
+
+Auto-detects job details on:
+
+- **LinkedIn**
+- **Greenhouse** (boards.greenhouse.io)
+- **Lever** (jobs.lever.co)
+- **Workday** (myworkdayjobs.com)
+- **Indeed**
+- **Jobvite**
+- **iCIMS**
+- Any site with a standard page title like "Role at Company" or "Role | Company"
+
+If a field doesn't auto-fill on a site you use, [open an issue](https://github.com/sahiltalati/applykit/issues) and I'll add support for it.
+
+---
+
+## Updating the Apps Script
+
+If you redeploy the Apps Script (e.g. after adding new columns), make sure to:
+- Select **New version** when deploying
+- The Web app URL stays the same — no need to update the extension settings
 
 ---
 
 ## Contributing
 
-PRs welcome. High-value additions:
-- Windows Auto-Move (Task Scheduler)
-- Linux Auto-Move (systemd service)
-- More ATS detectors in `extension/content.js`
-- Notion / Airtable / Excel backend in `sheets/`
+PRs welcome. Most useful additions:
+- More job site detectors in `extension/content.js`
+- Additional column support
+- Other spreadsheet backends (Notion, Airtable, Excel)
 
 ---
 
 ## License
 
-MIT — use it, fork it, build on it.
-
----
-
-Built with [Claude Code](https://claude.ai/code)
-
+MIT — free to use, fork, and build on.
